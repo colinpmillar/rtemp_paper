@@ -9,6 +9,7 @@ setwd("C:/work/repos/papers/rtemp_paper")
 years <- 2003:2009
 control_site <- 2
 felled_site <- 10
+felled_year <- 2004
 
 # select a few days data and add in decimal hour
 dat <- with(subset(stream, site %in% c(control_site, felled_site) & year %in% years), 
@@ -21,56 +22,22 @@ dat <- with(subset(stream, site %in% c(control_site, felled_site) & year %in% ye
 # 
 dat <- cleanData(dat)
 
-
-# tecnical setup
-basisdim <- 47 # original basis space for data
-redbasisdim <- 12 # reduced basis space for consistency
-nharm <- 4 # fully reduced space for modelling
-
 # set up a new set of bases
-reddat <- reduceData(dat)
+reddat <- reduceData(dat[1:200,])
+
+
+# a squiz at the PCs
+par(mfrow = c(2,2))
+plot(attr(reddat, "pc"))
+
+    
 
 
 
-
-
-
-
-
-# load required libraries
-library(lattice)
-library(fda)
-#library(reshape)
-library(mgcv)
-library(MASS)
-library(nlme)
-
-
-# get the data for each site:
-
-
-# get full data set
-
-choices <- data.frame(burn = c(10, 11, 7, 10, 11), year = c(1989, 1997, 1994, 2004, 2004))
-
-
-for (ichoices in 1:5) {
+  # sort out day... not sure why...
+  reddat $ day <- reddat $ day - min(reddat $ day) + reddat $ yday[1]
   
-  fname <- paste0("Z:/Loch_Ard_Felling/BHS/data/B", choices $ burn[ichoices], "_", choices $ year[ichoices], ".rda")
-  load(fname)
-  
-  #load("Z:/Loch_Ard_Felling/BHS/data/B10_2004.rda")
-  #load("Z:/Loch_Ard_Felling/BHS/data/B11_2004.rda")
-  #load("Z:/Loch_Ard_Felling/BHS/data/B7_1994.rda")
-  #load("Z:/Loch_Ard_Felling/BHS/data/B10_1989.rda")
-  #load("Z:/Loch_Ard_Felling/BHS/data/B11_1997.rda")
-  
-  # sort out day
-  info $ day <- info $ day - min(info $ day) + info $ yday[1]
-  
-  
-  #plot.pcs(info, main = "All data") 
-  
+  #plot_pcs(reddat, main = "All data") 
   #xyplot(PC1.y ~ yday | factor(year), data = info, as.table = TRUE)
   
   decays <- seq(0, 1, length = 11)
